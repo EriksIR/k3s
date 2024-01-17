@@ -14,6 +14,7 @@ spec:
     chart: kube-prometheus-stack
     targetRevision: "51.10.0"
     helm:
+      skipCrds: true
       values: |
         global:
           rbac:
