@@ -1,14 +1,32 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: prometheus
+  annotations:
+    notifications.argoproj.io/subscribe.on-sync-succeeded.teams: test-channel
+  name: kube-prometheus-stack
   namespace: local
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
-  destination:
-    name: in-cluster
-    namespace: local
   project: default
   source:
     repoURL: https://prometheus-community.github.io/helm-charts
-    targetRevision: 45.6.0
     chart: kube-prometheus-stack
+    targetRevision: "51.10.0"
+    helm:
+      values: |
+        fullnameOverride: kube-prometheus-stack
+        
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - Replace=true    
+      - PruneLast=true  
