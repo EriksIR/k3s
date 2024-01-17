@@ -14,13 +14,50 @@ spec:
     chart: kube-prometheus-stack
     targetRevision: "51.10.0"
     helm:
-      skipCrds: true
       values: |
         global:
           rbac:
-            create: false  
+            create: true  
         fullnameOverride: kube-prometheus-stack
-        
+        commonLabels:
+          prometheus: main
+        alertmanager:
+          enabled: false
+        grafana:
+          enabled: true
+          adminPassword: test-pass
+        prometheusOperator:
+          tls:
+            enabled: false
+          admissionWebhooks:
+              certManager:
+                enabled: true
+        prometheus:
+          enabled: true
+          prometheusSpec:
+            enableAdminAPI: true
+            disableCompaction: true
+            retention: 2h
+            storageSpec:
+              volumeClaimTemplate:
+                spec:
+                  accessModes: ["ReadWriteOnce"]
+                  resources:
+                    requests:
+                      storage: 10Gi
+            additionalScrapeConfigs:       
+            ruleSelector:
+              matchLabels:
+                prometheus: main
+            serviceMonitorSelector:
+              matchLabels:
+                prometheus: main
+            podMonitorSelector:
+              matchLabels:
+                prometheus: main
+            probeSelector:
+              matchLabels:
+                prometheus: main
 
   destination:
     server: https://kubernetes.default.svc
