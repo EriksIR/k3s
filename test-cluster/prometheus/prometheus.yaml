@@ -15,6 +15,9 @@ spec:
     targetRevision: "51.10.0"
     helm:
       values: |
+        global:
+          rbac:
+            create: false  
         fullnameOverride: kube-prometheus-stack
         
 
